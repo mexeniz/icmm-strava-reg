@@ -1,0 +1,14 @@
+{
+  "scripts": {
+    "start": "node ./app.js"
+  },
+  "name": "passport-strava-examples-login",
+  "version": "0.0.1",
+  "dependencies": {
+    "ejs": "2.6.1",
+    "express": "2.5.11",
+    "passport": "0.4.x",
+    "passport-strava-oauth2": "0.1.x",
+    "urlencode": "^1.1.0"
+  }
+}
