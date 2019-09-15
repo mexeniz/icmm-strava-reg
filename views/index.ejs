@@ -1,16 +1,19 @@
 <% if (!user) { %>
 	<img src="logo.png" class="img-thumbnail"/>
 	<br>
-	<h3>ชวนวิ่งสะสมระยะตามรุ่น เตรียมตะลุย ICMM2019</h3>
+	<h3>ชวนวิ่งสะสมระยะตามรุ่น เตรียมตะลุย ICMM2020</h3>
 	<h3>ระยะเวลา 3 เดือน (19/10/18 - 11/01/19)</h3>
 	<br>
 	<h4>Log in เพื่อเข้าร่วมเก็บระยะวิ่งด้วย Strava</h4>
-	<a href="/auth/strava" class="btn btn-lg btn-secondary">Login</a>
+	<a href="/login" class="btn btn-lg btn-secondary">Login</a>
 <% } else { %>
 	<img src="<%= user.photos[0].value %>" class="img-thumbnail">
 	<br>
 	<h2><%= user.displayName %></h2>
-	<h4>ลงทะเบียน Challenge สำเร็จแล้ว</h4>
-	<br>
-	<h4>อย่าไปกด Join Club ประจำรุ่นใน Strava เพื่อสะสมระยะ</h4>
+
+	<% if (user.foundation) { %>
+		<h4>ลงทะเบียน Challenge สำเร็จแล้ว</h4>
+	<% } else { %>
+		<h4>ไปที่ Profile เพื่อกรอกข้อมูลเพิ่มเติมก่อนเริ่มสะสมระยะ</h4>
+	<% } %>
 <% } %>

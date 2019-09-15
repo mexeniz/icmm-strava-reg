@@ -77,16 +77,24 @@ app.get('/', function(req, res){
   res.render('index', { user: req.user });
 });
 
-// app.get('/account', ensureAuthenticated, function(req, res){
-//   res.render('account', { user: req.user });
-// });
+app.get('/profile', ensureAuthenticated, function(req, res){
+  // TODO(M): Read users table here ...
+  var data = { 
+    stravaProfile: req.user,
+    user: {
+      intania: 96,
+      totalDistance: 96.96
+    }
+  };
+  res.render('profile', data);
+});
 
-// GET /auth/strava
+// GET /login
 //   Use passport.authenticate() as route middleware to authenticate the
 //   request.  The first step in Strava authentication will involve
 //   redirecting the user to strava.com.  After authorization, Strava
 //   will redirect the user back to this application at /auth/strava/callback
-app.get('/auth/strava',
+app.get('/login',
   passport.authenticate('strava', { scope: ['public']}),
   function(req, res){
     // The request will be redirected to Strava for authentication, so this
@@ -99,7 +107,7 @@ app.get('/auth/strava',
 //   login page.  Otherwise, the primary route function function will be called,
 //   which, in this example, will redirect the user to the home page.
 app.get('/auth/strava/callback', 
-  passport.authenticate('strava', { failureRedirect: '/login' }),
+  passport.authenticate('strava', { failureRedirect: '/' }),
   function(req, res) {
     // Log token/code and save them to a file.
     var user = req.user

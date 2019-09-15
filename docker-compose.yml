@@ -9,7 +9,7 @@ services:
       - BIND_ADDRESS=${BIND_ADDRESS}
       - PORT=${PORT}
       - CALL_BACK_URL=${CALL_BACK_URL}
-      - AUTH_DATA_FILE=/data
+      - AUTH_DATA_FILE=/data/auth_data.csv
     volumes:
       - ./data:/data
     ports:
