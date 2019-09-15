@@ -121,6 +121,7 @@ app.get('/logout', function(req, res){
 
 app.listen(PORT, BIND_ADDRESS);
 console.log(`App listen ${BIND_ADDRESS}:${PORT}`);
+console.log(`App Strava Client ${STRAVA_CLIENT_ID}`);
 
 
 // Simple route middleware to ensure user is authenticated.

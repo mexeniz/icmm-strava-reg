@@ -4,10 +4,11 @@ services:
   strava-reg:
     build: .
     environment:
-      - STRAVA_CLIENT_ID=''
-      - STRAVA_CLIENT_SECRET=''
-      - PORT=3000
-      - CALL_BACK_URL=''
+      - STRAVA_CLIENT_ID=${STRAVA_CLIENT_ID}
+      - STRAVA_CLIENT_SECRET=${STRAVA_CLIENT_SECRET}
+      - BIND_ADDRESS=${BIND_ADDRESS}
+      - PORT=${PORT}
+      - CALL_BACK_URL=${CALL_BACK_URL}
       - AUTH_DATA_FILE=/data
     volumes:
       - ./data:/data
