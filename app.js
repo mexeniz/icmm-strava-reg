@@ -56,9 +56,11 @@ var app = express.createServer();
 
 // configure Express
 app.configure(function () {
-  if (SERVICE_TYPE === "foundation"){
+  if (SERVICE_TYPE === "foundation") {
+    console.log("Run as foundation challenge service");
     app.set('views', __dirname + '/views/foundation');
-  }else{
+  } else {
+    console.log("Run as intania challenge service");
     app.set('views', __dirname + '/views/intania');
   }
   app.set('view engine', 'ejs');
@@ -77,19 +79,84 @@ app.configure(function () {
 
 
 app.get('/', function (req, res) {
-  res.render('index', { user: req.user });
+  if (req.user) {
+    // User is authenticated
+    models.users.findAll({
+      limit: 1,
+      where: {
+        strava_id: req.user.id,
+      },
+      include: [
+        models.intania_clubs
+      ]
+    }).then(entries => {
+      if (entries.length == 0) {
+        // Failed to find user information
+        res.render('index');
+      } else {
+        var user = entries[0];
+        // Check if user joined intania clubs
+        var intania;
+        if (user.intania_clubs.length == 0) {
+          intania = null;
+        } else {
+          intania = user.intania_clubs[0].intania;
+        }
+        var data = {
+          stravaProfile: req.user,
+          user: {
+            firstName: user.first_name,
+            lastName: user.last_name,
+            intania: intania,
+            totalDistance: 96.96
+          }
+        };
+        res.render('index', data);
+      }
+    })
+  } else {
+    // User is not authenticated
+    res.render('index', { user: null });
+  }
 });
 
 app.get('/profile', ensureAuthenticated, function (req, res) {
-  // TODO(M): Read users table here ...
-  var data = {
-    stravaProfile: req.user,
-    user: {
-      intania: 96,
-      totalDistance: 96.96
+  models.users.findAll({
+    limit: 1,
+    where: {
+      strava_id: req.user.id,
+    },
+    include: [
+      models.intania_clubs
+    ]
+  }).then(entries => {
+
+    if (entries.length == 0) {
+      return res.status(404).send({
+        message: 'No matching strava account information'
+      });
+    } else {
+      var user = entries[0];
+      // Check if user joined intania clubs
+      var intania;
+      if (user.intania_clubs.length == 0) {
+        intania = null;
+      } else {
+        intania = user.intania_clubs[0].intania;
+      }
+      var data = {
+        stravaProfile: req.user,
+        user: {
+          firstName: user.first_name,
+          lastName: user.last_name,
+          intania: intania,
+          totalDistance: 96.96
+        }
+      };
+      res.render('profile', data);
     }
-  };
-  res.render('profile', data);
+
+  })
 });
 
 // GET /login

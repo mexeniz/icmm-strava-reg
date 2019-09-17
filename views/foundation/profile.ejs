@@ -3,8 +3,9 @@
 	<br>
 	<img src="<%= stravaProfile.photos[0].value %>" class="img-thumbnail">
 	<br>
-	<h2><%= stravaProfile.displayName %></h2>
+	<h2><%= user.firstName user.lasttName %></h2>
 	<a href="https://www.strava.com/athletes/<%= stravaProfile.id %>" class="btn btn-primary">Strava Profile</a>
+	<br>
 	<br>
 	<% if (user.foundation) { %>
 		<h4>Foundation: <%= user.foundation %></h4>
@@ -49,16 +50,11 @@
 						required>
 				</div>
 				<div class="form-group">
-					<button type="button" id="searchButton" class="btn btn-primary">
-						ค้นหา
+					<button type="button" id="submitButton" class="btn btn-primary">
+						ส่ง
 					</button>
 				</div>
 			</form>
-			<div class="form-group">
-				<button type="button" id="submitButton" class="btn btn-primary">
-					ส่ง
-				</button>
-			</div>
 		</form>
 	<% } %>
 <% } else { %>

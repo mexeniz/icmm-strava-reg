@@ -7,9 +7,9 @@
 	<h4>Log in เพื่อเข้าร่วมเก็บระยะวิ่งด้วย Strava</h4>
 	<a href="/login" class="btn btn-lg btn-secondary">Login</a>
 <% } else { %>
-	<img src="<%= user.photos[0].value %>" class="img-thumbnail">
+	<img src="<%= stravaProfile.photos[0].value %>" class="img-thumbnail">
 	<br>
-	<h2><%= user.displayName %></h2>
+	<h2><%= user.firstName %> <%= user.lastName %></h2>
 
 	<% if (user.intania) { %>
 		<h4>ลงทะเบียน Challenge สำเร็จแล้ว</h4>
