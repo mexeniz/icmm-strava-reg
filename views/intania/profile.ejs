@@ -1,0 +1,16 @@
+<% if (user) { %>
+
+	<h2>Runner Profile</h2>
+	<br>
+	<img src="<%= stravaProfile.photos[0].value %>" class="img-thumbnail">
+	<br>
+	<h2><%= stravaProfile.displayName %></h2>
+	<a href="https://www.strava.com/athletes/<%= stravaProfile.id %>" class="btn btn-primary">Strava Profile</a>
+	<br>
+	<h4>Intania: <%= user.intania %></h4>
+	<h4>ระยะทางสะสม: <%= user.totalDistance %> KM</h4>
+	<br>
+<% } else { %>
+	<h3 color='red'>ไม่พบข้อมูล กรุณา Login ใหม่</h3>
+	<a href="/login" class="btn btn-lg btn-secondary">Login</a>
+<% } %>

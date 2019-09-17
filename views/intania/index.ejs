@@ -1,0 +1,20 @@
+<% if (!user) { %>
+	<img src="logo.png" class="img-thumbnail"/>
+	<br>
+	<h3>ชวนวิ่งสะสมระยะตามรุ่น เตรียมตะลุย ICMM2020</h3>
+	<h3>ระยะเวลา 2 เดือน (5/10/19 - 10/01/20)</h3>
+	<br>
+	<h4>Log in เพื่อเข้าร่วมเก็บระยะวิ่งด้วย Strava</h4>
+	<a href="/login" class="btn btn-lg btn-secondary">Login</a>
+<% } else { %>
+	<img src="<%= user.photos[0].value %>" class="img-thumbnail">
+	<br>
+	<h2><%= user.displayName %></h2>
+
+	<% if (user.intania) { %>
+		<h4>ลงทะเบียน Challenge สำเร็จแล้ว</h4>
+		<h4>Intania <%= user.intania %></h4>
+	<% } else { %>
+		<h4>ไม่พบข้อมูลรุ่น กรุณา join Strava club ประจำรุ่นก่อนเริ่มสะสมระยะ</h4>
+	<% } %>
+<% } %>

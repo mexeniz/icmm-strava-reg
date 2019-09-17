@@ -56,7 +56,11 @@ var app = express.createServer();
 
 // configure Express
 app.configure(function () {
-  app.set('views', __dirname + '/views');
+  if (SERVICE_TYPE === "foundation"){
+    app.set('views', __dirname + '/views/foundation');
+  }else{
+    app.set('views', __dirname + '/views/intania');
+  }
   app.set('view engine', 'ejs');
   app.use(express.logger());
   app.use(express.cookieParser());
