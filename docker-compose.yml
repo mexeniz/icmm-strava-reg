@@ -1,16 +1,28 @@
 version: '3.4'
 
 services:
-  strava-reg:
+  strava-intania-reg:
     build: .
     environment:
-      - STRAVA_CLIENT_ID=${STRAVA_CLIENT_ID}
-      - STRAVA_CLIENT_SECRET=${STRAVA_CLIENT_SECRET}
-      - BIND_ADDRESS=${BIND_ADDRESS}
-      - PORT=${PORT}
-      - CALL_BACK_URL=${CALL_BACK_URL}
-      - AUTH_DATA_FILE=/data/auth_data.csv
-    volumes:
-      - ./data:/data
+      - STRAVA_CLIENT_ID=${INT_STRAVA_CLIENT_ID}
+      - STRAVA_CLIENT_SECRET=${INT_STRAVA_CLIENT_SECRET}
+      - CALL_BACK_URL=${INT_CALL_BACK_URL}
+      - DB_HOST=${DB_HOST}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - SERVICE_TYPE="intania"
     ports:
       - 8090:3000
+    
+  strava-foundation-reg:
+    build: .
+    environment:
+      - STRAVA_CLIENT_ID=${F5_STRAVA_CLIENT_ID}
+      - STRAVA_CLIENT_SECRET=${F5_STRAVA_CLIENT_SECRET}
+      - CALL_BACK_URL=${F5_CALL_BACK_URL}
+      - DB_HOST=${DB_HOST}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - SERVICE_TYPE="foundation"
+    ports:
+      - 8091:3000
