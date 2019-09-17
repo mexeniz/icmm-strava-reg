@@ -7,12 +7,12 @@ var urlencode = require('urlencode');
 
 const models = require('./models')
 
-var STRAVA_CLIENT_ID = process.env.STRAVA_CLIENT_ID;
-var STRAVA_CLIENT_SECRET = process.env.STRAVA_CLIENT_SECRET;
-var BIND_ADDRESS = process.env.BIND_ADDRESS || "localhost";
-var PORT = process.env.PORT || 3000;
-var CALL_BACK_URL = process.env.CALL_BACK_URL || `http://${BIND_ADDRESS}:${PORT}`;
-var AUTH_DATA_FILE = process.env.AUTH_DATA_FILE || "./auth_data.txt";
+const STRAVA_CLIENT_ID = process.env.STRAVA_CLIENT_ID;
+const STRAVA_CLIENT_SECRET = process.env.STRAVA_CLIENT_SECRET;
+const BIND_ADDRESS = process.env.BIND_ADDRESS || "0.0.0.0";
+const PORT = process.env.PORT || 3000;
+const CALL_BACK_URL = process.env.CALL_BACK_URL || `http://${BIND_ADDRESS}:${PORT}`;
+const SERVICE_TYPE = process.env.SERVICE_TYPE || "intania";
 
 // Passport session setup.
 //   To support persistent login sessions, Passport needs to be able to
@@ -76,9 +76,9 @@ app.get('/', function (req, res) {
   res.render('index', { user: req.user });
 });
 
-app.get('/profile', ensureAuthenticated, function(req, res){
+app.get('/profile', ensureAuthenticated, function (req, res) {
   // TODO(M): Read users table here ...
-  var data = { 
+  var data = {
     stravaProfile: req.user,
     user: {
       intania: 96,
@@ -92,10 +92,10 @@ app.get('/profile', ensureAuthenticated, function(req, res){
 //   Use passport.authenticate() as route middleware to authenticate the
 //   request.  The first step in Strava authentication will involve
 //   redirecting the user to strava.com.  After authorization, Strava
-//   will redirect the user back to this application at /auth/strava/callback
+//   will redirect the user back to this application at /login/callback
 app.get('/login',
-  passport.authenticate('strava', { scope: ['public']}),
-  function(req, res){
+  passport.authenticate('strava', { scope: ['public'] }),
+  function (req, res) {
     // The request will be redirected to Strava for authentication, so this
     // function will not be called.
   });
@@ -105,12 +105,13 @@ app.get('/login',
 //   request.  If authentication fails, the user will be redirected back to the
 //   login page.  Otherwise, the primary route function function will be called,
 //   which, in this example, will redirect the user to the home page.
-app.get('/auth/strava/callback', 
+app.get('/auth/strava/callback',
   passport.authenticate('strava', { failureRedirect: '/' }),
-  function(req, res) {
+  function (req, res) {
     // Log token/code and save them to a file.
     var user = req.user
     var code = req.query.code
+    var userId;
     console.log(`Code:${code}, Authorized user:`);
     console.log(user._raw);
 
@@ -118,23 +119,48 @@ app.get('/auth/strava/callback',
       limit: 1,
       where: {
         strava_id: user.id,
-      },
+      }
     }).then(entries => {
       if (entries.length == 0) {
         return models.users.create({
           first_name: user.name.givenName,
           last_name: user.name.familyName,
-          strava_id: user.id,
-          strava_code: code,
+          strava_id: user.id
+        })
+      } else {
+        userId = entries[0].id;
+        console.log(`Found user: id=${userId} strava_id=${user.id}`);
+      }
+    }).then((entry) => {
+      if (entry) {
+        userId = entry.id;
+        console.log(`Created new user: id=${userId} strava_id=${user.id}`);
+      }
+
+      return models.credentials.findAll({
+        limit: 1,
+        where: {
+          strava_client: STRAVA_CLIENT_ID,
+          strava_token: user.token
+        }
+      })
+    }).then(entries => {
+      if (entries.length == 0) {
+        console.log(`Creating new credential: id=${userId} strava_client=${STRAVA_CLIENT_ID}`);
+        return models.credentials.create({
+          id: userId,
+          strava_client: STRAVA_CLIENT_ID,
           strava_token: user.token,
+          strava_code: code,
         })
       }
-    }).then(() => {
-      return res.redirect('/');
-    }).catch(err => {
-      console.error(err);
-      return res.redirect('/auth/strava')
     })
+      .then(() => {
+        return res.redirect('/');
+      }).catch(err => {
+        console.error(err);
+        return res.redirect('/login')
+      })
   });
 
 app.get('/logout', function (req, res) {
@@ -145,7 +171,7 @@ app.get('/logout', function (req, res) {
 app.post('/me',
   (req, res) => {
     if (!req.isAuthenticated()) {
-      return res.redirect('/auth/strava')
+      return res.redirect('/login')
     }
 
     const user = req.user;
@@ -158,7 +184,7 @@ app.post('/me',
       },
     }).then(entries => {
       if (entries.length == 0) {
-        return res.redirect('/auth/strava')
+        return res.redirect('/login')
       }
 
       let user = entries[0];
@@ -197,7 +223,7 @@ app.post('/me',
       return res.redirect('/');
     }).catch(err => {
       console.error(err);
-      return res.redirect('/auth/strava')
+      return res.redirect('/login')
     })
   });
 
