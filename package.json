@@ -7,8 +7,10 @@
   "dependencies": {
     "ejs": "2.6.1",
     "express": "2.5.11",
+    "mysql2": "^1.7.0",
     "passport": "0.4.x",
     "passport-strava-oauth2": "0.1.x",
+    "sequelize": "^5.18.4",
     "urlencode": "^1.1.0"
   }
 }
