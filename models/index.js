@@ -40,16 +40,31 @@ db.Sequelize = Sequelize;
 
 const users = db.users;
 const intania_clubs = db.intania_clubs;
+const activities = db.activities;
+const registrations = db.registrations;
 
-users.belongsToMany(intania_clubs, { 
+// Relation: users  - intania_clubs
+users.belongsToMany(intania_clubs, {
     through: 'user_clubs',
     foreignKey: 'user_id',
     otherKey: 'club_id'
 });
-intania_clubs.belongsToMany(users, { 
+intania_clubs.belongsToMany(users, {
     through: 'user_clubs',
     foreignKey: 'club_id',
     otherKey: 'user_id'
 });
+// Relation: users - activities
+users.hasMany(activities, {
+    foreignKey: 'user_id'
+});
+activities.belongsTo(users, {
+    foreignKey: 'user_id'
+});
+// Relation: users - rehistrations
+registrations.belongsTo(users, {
+    foreignKey: 'user_id'
+});
+
 
 module.exports = db;

@@ -2,10 +2,12 @@ var express = require('express')
   , passport = require('passport')
   , util = require('util')
   , StravaStrategy = require('passport-strava-oauth2').Strategy
-  , fs = require('fs');;
+  , fs = require('fs');
 var urlencode = require('urlencode');
 
 const models = require('./models')
+const resHelper = require('./resHelper')
+const queryHelper = require('./queryHelper')
 
 const STRAVA_CLIENT_ID = process.env.STRAVA_CLIENT_ID;
 const STRAVA_CLIENT_SECRET = process.env.STRAVA_CLIENT_SECRET;
@@ -81,36 +83,12 @@ app.configure(function () {
 app.get('/', function (req, res) {
   if (req.user) {
     // User is authenticated
-    models.users.findAll({
-      limit: 1,
-      where: {
-        strava_id: req.user.id,
-      },
-      include: [
-        models.intania_clubs
-      ]
-    }).then(entries => {
+    queryHelper.getOneUserByStravaId(req.user.id).then(entries => {
       if (entries.length == 0) {
         // Failed to find user information
-        res.render('index');
+        res.render('index', { user: null });
       } else {
-        var user = entries[0];
-        // Check if user joined intania clubs
-        var intania;
-        if (user.intania_clubs.length == 0) {
-          intania = null;
-        } else {
-          intania = user.intania_clubs[0].intania;
-        }
-        var data = {
-          stravaProfile: req.user,
-          user: {
-            firstName: user.first_name,
-            lastName: user.last_name,
-            intania: intania,
-            totalDistance: 96.96
-          }
-        };
+        var data = resHelper.makeUserData(entries[0], req.user);
         res.render('index', data);
       }
     })
@@ -121,38 +99,13 @@ app.get('/', function (req, res) {
 });
 
 app.get('/profile', ensureAuthenticated, function (req, res) {
-  models.users.findAll({
-    limit: 1,
-    where: {
-      strava_id: req.user.id,
-    },
-    include: [
-      models.intania_clubs
-    ]
-  }).then(entries => {
-
+  queryHelper.getOneUserByStravaId(req.user.id).then(entries => {
     if (entries.length == 0) {
       return res.status(404).send({
         message: 'No matching strava account information'
       });
     } else {
-      var user = entries[0];
-      // Check if user joined intania clubs
-      var intania;
-      if (user.intania_clubs.length == 0) {
-        intania = null;
-      } else {
-        intania = user.intania_clubs[0].intania;
-      }
-      var data = {
-        stravaProfile: req.user,
-        user: {
-          firstName: user.first_name,
-          lastName: user.last_name,
-          intania: intania,
-          totalDistance: 96.96
-        }
-      };
+      var data = resHelper.makeUserData(entries[0], req.user);
       res.render('profile', data);
     }
 
