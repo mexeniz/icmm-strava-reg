@@ -2,10 +2,12 @@ var express = require('express')
   , passport = require('passport')
   , util = require('util')
   , StravaStrategy = require('passport-strava-oauth2').Strategy
-  , fs = require('fs');;
+  , fs = require('fs');
 var urlencode = require('urlencode');
 
 const models = require('./models')
+const resHelper = require('./resHelper')
+const queryHelper = require('./queryHelper')
 
 const STRAVA_CLIENT_ID = process.env.STRAVA_CLIENT_ID;
 const STRAVA_CLIENT_SECRET = process.env.STRAVA_CLIENT_SECRET;
@@ -56,7 +58,13 @@ var app = express.createServer();
 
 // configure Express
 app.configure(function () {
-  app.set('views', __dirname + '/views');
+  if (SERVICE_TYPE === "foundation") {
+    console.log("Run as foundation challenge service");
+    app.set('views', __dirname + '/views/foundation');
+  } else {
+    console.log("Run as intania challenge service");
+    app.set('views', __dirname + '/views/intania');
+  }
   app.set('view engine', 'ejs');
   app.use(express.logger());
   app.use(express.cookieParser());
@@ -73,19 +81,35 @@ app.configure(function () {
 
 
 app.get('/', function (req, res) {
-  res.render('index', { user: req.user });
+  if (req.user) {
+    // User is authenticated
+    queryHelper.getOneUserByStravaId(req.user.id).then(entries => {
+      if (entries.length == 0) {
+        // Failed to find user information
+        res.render('index', { user: null });
+      } else {
+        var data = resHelper.makeUserData(entries[0], req.user);
+        res.render('index', data);
+      }
+    })
+  } else {
+    // User is not authenticated
+    res.render('index', { user: null });
+  }
 });
 
 app.get('/profile', ensureAuthenticated, function (req, res) {
-  // TODO(M): Read users table here ...
-  var data = {
-    stravaProfile: req.user,
-    user: {
-      intania: 96,
-      totalDistance: 96.96
+  queryHelper.getOneUserByStravaId(req.user.id).then(entries => {
+    if (entries.length == 0) {
+      return res.status(404).send({
+        message: 'No matching strava account information'
+      });
+    } else {
+      var data = resHelper.makeUserData(entries[0], req.user);
+      res.render('profile', data);
     }
-  };
-  res.render('profile', data);
+
+  })
 });
 
 // GET /login

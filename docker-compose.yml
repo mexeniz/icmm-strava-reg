@@ -10,7 +10,7 @@ services:
       - DB_HOST=${DB_HOST}
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
-      - SERVICE_TYPE="intania"
+      - SERVICE_TYPE=intania
     ports:
       - 8090:3000
     
@@ -23,6 +23,6 @@ services:
       - DB_HOST=${DB_HOST}
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
-      - SERVICE_TYPE="foundation"
+      - SERVICE_TYPE=foundation
     ports:
       - 8091:3000
