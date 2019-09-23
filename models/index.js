@@ -42,6 +42,7 @@ const users = db.users;
 const intania_clubs = db.intania_clubs;
 const activities = db.activities;
 const registrations = db.registrations;
+const foundations = db.foundations;
 
 // Relation: users  - intania_clubs
 users.belongsToMany(intania_clubs, {
@@ -61,10 +62,13 @@ users.hasMany(activities, {
 activities.belongsTo(users, {
     foreignKey: 'user_id'
 });
-// Relation: users - rehistrations
-registrations.belongsTo(users, {
-    foreignKey: 'user_id'
+// Relation: users - registrations
+users.belongsTo(registrations, {
+    foreignKey: 'registration_id'
 });
-
+// Relation registrations - foundations
+registrations.belongsTo(foundations, {
+    foreignKey: 'foundation_id'
+});
 
 module.exports = db;
