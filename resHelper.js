@@ -31,7 +31,7 @@ module.exports.makeUserData = function (user, stravaProfile) {
         userData['foundation'] = null
     }
 
-    if (user.activities && user.activities[0].length != 0){
+    if (user.activities && user.activities.length != 0){
         userData.user['totalDistance'] = parseInt(user.activities[0].dataValues.total_distance);
         userData.user['totalActivities'] = parseInt(user.activities[0].dataValues.totalActivities);
     } else {
