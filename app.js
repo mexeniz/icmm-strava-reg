@@ -225,9 +225,11 @@ if (SERVICE_TYPE == "foundation") {
             }
           }).then(entries => {
             if (entries.length == 0) {
-              return res.status(404).send({
-                message: 'No matching registration information'
-              });
+              var data = resHelper.makeUserData(user, req.user);
+              data['error'] = {
+                message: "ข้อมูลรหัสลงทะเบียนไม่ถูกต้อง"
+              }
+              return res.render('error', data);
             }
             // Update user.registration_id in database
             user.registration_id = entries[0].id;
@@ -244,9 +246,11 @@ if (SERVICE_TYPE == "foundation") {
             }
           }).then(entries => {
             if (entries.length == 0) {
-              return res.status(404).send({
-                message: 'No matching registration information'
-              });
+              var data = resHelper.makeUserData(user, req.user);
+              data['error'] = {
+                message: "ข้อมูล ชื่อ นามสกุล หรือ เบอร์โทร ไม่ถูกต้อง"
+              }
+              return res.render('error', data);
             }
             // Update user.registration_id in database
             user.registration_id = entries[0].id;
@@ -261,7 +265,11 @@ if (SERVICE_TYPE == "foundation") {
         return res.redirect('/profile');
       }).catch(err => {
         console.error(err);
-        return res.redirect('/login')
+        return res.render('error', {
+          error: {
+            message: "Internal server error"
+          }
+        });
       })
     });
 }
