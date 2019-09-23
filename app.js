@@ -192,64 +192,63 @@ app.get('/logout', function (req, res) {
   res.redirect('/');
 });
 
-app.post('/me',
-  (req, res) => {
-    if (!req.isAuthenticated()) {
-      return res.redirect('/login')
-    }
-
-    const user = req.user;
-    const { registration_id, phone_number, first_name, last_name, race_type, race_category } = req.body;
-
-    return models.users.findAll({
-      limit: 1,
-      where: {
-        strava_id: user.id,
-      },
-    }).then(entries => {
-      if (entries.length == 0) {
+if (SERVICE_TYPE == "foundation") {
+  app.post('/me',
+    (req, res) => {
+      if (!req.isAuthenticated()) {
         return res.redirect('/login')
       }
 
-      let user = entries[0];
+      const user = req.user;
+      console.log('req.body');
+      console.log(req.body);
+      const { registration_id, phone_number, first_name, last_name, race_type, race_category } = req.body;
 
-      if (registration_id) {
-        user.registration_id = registration_id;
+      return queryHelper.getOneUserByStravaId(req.user.id).then(entries => {
+        if (entries.length == 0) {
+          return res.redirect('/login')
+        }
+        return res.redirect('/');
+        // let user = entries[0];
 
-        return user.save()
-      } else if (phone_number && first_name && last_name && race_type && race_category) {
-        return models.registrations.findAll({
-          limit: 1,
-          where: {
-            phone_number,
-            first_name,
-            last_name,
-            race_type,
-            race_category,
-          }
-        }).then(entries => {
-          if (entries.length == 0) {
-            return res.status(404).send({
-              message: 'No matching registration information'
-            });
-          }
+        // if (registration_id) {
+        //   user.registration_id = registration_id;
 
-          user.registration_id = entries[0].id;
+        //   return user.save()
+        // } else if (phone_number && first_name && last_name && race_type && race_category) {
+        //   return models.registrations.findAll({
+        //     limit: 1,
+        //     where: {
+        //       phone_number,
+        //       first_name,
+        //       last_name,
+        //       race_type,
+        //       race_category,
+        //     }
+        //   }).then(entries => {
+        //     if (entries.length == 0) {
+        //       return res.status(404).send({
+        //         message: 'No matching registration information'
+        //       });
+        //     }
 
-          return user.save()
-        })
-      } else {
-        return res.status(400).send({
-          message: 'Bad request'
-        });
-      }
-    }).then(() => {
-      return res.redirect('/');
-    }).catch(err => {
-      console.error(err);
-      return res.redirect('/login')
-    })
-  });
+        //     user.registration_id = entries[0].id;
+
+        //     return user.save()
+        //   })
+        // } else {
+        //   return res.status(400).send({
+        //     message: 'Bad request'
+        //   });
+        // }
+      }).then(() => {
+        return res.redirect('/');
+      }).catch(err => {
+        console.error(err);
+        return res.redirect('/login')
+      })
+    });
+}
 
 app.listen(PORT, BIND_ADDRESS);
 console.log(`App listen ${BIND_ADDRESS}:${PORT}`);

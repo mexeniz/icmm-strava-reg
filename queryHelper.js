@@ -9,6 +9,12 @@ module.exports.getOneUserByStravaId = function (strava_id) {
         include: [
           models.intania_clubs,
           {
+            model: models.registrations,
+            include: [
+              models.foundations
+            ]
+          },
+          {
             model: models.activities,
             attributes: [
             [models.sequelize.fn('sum', models.sequelize.col('activities.distance')), 'total_distance'],
