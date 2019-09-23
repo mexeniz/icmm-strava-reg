@@ -15,7 +15,7 @@
 		<h4>กรุณากรอกข้อมูลที่ได้จากการสมัคร ICMM 2020</h4>
 		<br>
 		<h4>ลงทะเบียนด้วย Registration ID จาก Thai.run</h4>
-		<form action="/me" method="post" id="reg-form" role="form" style="display: block;">
+		<form action="me" method="post" id="reg-form" role="form" style="display: block;">
 			<div class="form-group">
 				<label>รหัสลงทะเบียน</label>
 				<input type="text" name="registrationId" id="registrationId" tabindex="1" class="form-control" required>
@@ -29,7 +29,7 @@
 		<br>
 		<br>
 		<h4>ลงทะเบียนด้วย ชื่อ - นามสกุล</h4>
-		<form action="/me" method="post" id="reg-form" role="form" style="display: block;">
+		<form action="me" method="post" id="reg-form" role="form" style="display: block;">
 			<form id="search-form" role="form" style="display: block;">
 				<div class="row">
                     <div class="col-md-6 mb-3">
@@ -61,5 +61,5 @@
 	<% } %>
 <% } else { %>
 	<h3 color='red'>ไม่พบข้อมูล กรุณา Login ใหม่</h3>
-	<a href="/login" class="btn btn-lg btn-secondary">Login</a>
+	<a href="login" class="btn btn-lg btn-secondary">Login</a>
 <% } %>
