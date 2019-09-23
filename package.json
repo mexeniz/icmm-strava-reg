@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "start": "node ./app.js"
+    "start": "nodemon --legacy-watch app.js"
   },
   "name": "passport-strava-examples-login",
   "version": "0.0.1",
