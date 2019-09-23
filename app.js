@@ -202,47 +202,63 @@ if (SERVICE_TYPE == "foundation") {
       const user = req.user;
       console.log('req.body');
       console.log(req.body);
-      const { registration_id, phone_number, first_name, last_name, race_type, race_category } = req.body;
+      const { registrationId, phoneNumber, firstName, lastName, raceType } = req.body;
 
       return queryHelper.getOneUserByStravaId(req.user.id).then(entries => {
         if (entries.length == 0) {
           return res.redirect('/login')
         }
-        return res.redirect('/');
-        // let user = entries[0];
+        let user = entries[0];
+        if (user.registration){
+          // Registration info
+          return res.status(400).send({
+            message: 'User have already registered.'
+          });
+        }
 
-        // if (registration_id) {
-        //   user.registration_id = registration_id;
-
-        //   return user.save()
-        // } else if (phone_number && first_name && last_name && race_type && race_category) {
-        //   return models.registrations.findAll({
-        //     limit: 1,
-        //     where: {
-        //       phone_number,
-        //       first_name,
-        //       last_name,
-        //       race_type,
-        //       race_category,
-        //     }
-        //   }).then(entries => {
-        //     if (entries.length == 0) {
-        //       return res.status(404).send({
-        //         message: 'No matching registration information'
-        //       });
-        //     }
-
-        //     user.registration_id = entries[0].id;
-
-        //     return user.save()
-        //   })
-        // } else {
-        //   return res.status(400).send({
-        //     message: 'Bad request'
-        //   });
-        // }
+        if (registrationId) {
+          // Register by registration ID from Thai.run
+          return models.registrations.findAll({
+            limit: 1,
+            where: {
+              registration_id: registrationId,
+            }
+          }).then(entries => {
+            if (entries.length == 0) {
+              return res.status(404).send({
+                message: 'No matching registration information'
+              });
+            }
+            // Update user.registration_id in database
+            user.registration_id = entries[0].id;
+            return user.save()
+          })
+        } else if (firstName && lastName && phoneNumber) {
+          // Register by general information
+          return models.registrations.findAll({
+            limit: 1,
+            where: {
+              phone_number: phoneNumber,
+              first_name: firstName,
+              last_name: lastName,
+            }
+          }).then(entries => {
+            if (entries.length == 0) {
+              return res.status(404).send({
+                message: 'No matching registration information'
+              });
+            }
+            // Update user.registration_id in database
+            user.registration_id = entries[0].id;
+            return user.save()
+          })
+        } else {
+          return res.status(400).send({
+            message: 'Bad request'
+          });
+        }
       }).then(() => {
-        return res.redirect('/');
+        return res.redirect('/profile');
       }).catch(err => {
         console.error(err);
         return res.redirect('/login')
