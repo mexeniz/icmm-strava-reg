@@ -11,5 +11,6 @@ module.exports = (sequelize, DataTypes) => {
         race_type: DataTypes.STRING,
         race_category: DataTypes.STRING,
         foundation_id: DataTypes.BIGINT,
+        registration_id: DataTypes.STRING,
     });
 };

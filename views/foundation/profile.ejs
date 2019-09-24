@@ -3,29 +3,33 @@
 	<br>
 	<img src="<%= stravaProfile.photos[0].value %>" class="img-thumbnail">
 	<br>
-	<h2><%= user.firstName user.lasttName %></h2>
+	<h2><%= user.firstName %> <%= user.lastName %></h2>
 	<a href="https://www.strava.com/athletes/<%= stravaProfile.id %>" class="btn btn-primary">Strava Profile</a>
 	<br>
 	<br>
 	<% if (user.foundation) { %>
-		<h4>Foundation: <%= user.foundation %></h4>
-		<h4>ระยะทางสะสม: <%= user.totalDistance %> KM</h4>
+		<h4>Team: <%= user.foundation.name %></h4>
+		<h4>ระยะทางสะสม: <%= user.totalDistance / 1000.0 %> KM</h4>
 		<br>
 	<% } else { %>
 		<h4>กรุณากรอกข้อมูลที่ได้จากการสมัคร ICMM 2020</h4>
-		<form id="reg-form" role="form" style="display: block;">
+		<br>
+		<h4>ลงทะเบียนด้วย Registration ID จาก Thai.run</h4>
+		<form action="/me" method="post" id="reg-form" role="form" style="display: block;">
 			<div class="form-group">
 				<label>รหัสลงทะเบียน</label>
-				<input type="text" name="regId" id="regId" tabindex="1" class="form-control" required>
+				<input type="text" name="registrationId" id="registrationId" tabindex="1" class="form-control" required>
 			</div>
 			<div class="form-group">
-				<button type="button" id="submitButton" class="btn btn-primary">
+				<button type="submit" id="submitButton" class="btn btn-primary">
 					ส่ง
 				</button>
 			</div>
 		</form>
 		<br>
-		<form id="reg-form" role="form" style="display: block;">
+		<br>
+		<h4>ลงทะเบียนด้วย ชื่อ - นามสกุล</h4>
+		<form action="/me" method="post" id="reg-form" role="form" style="display: block;">
 			<form id="search-form" role="form" style="display: block;">
 				<div class="row">
                     <div class="col-md-6 mb-3">
@@ -45,15 +49,13 @@
                 </div>
 				<div class="form-group">
 					<label>หมายเลขโทรศัพท์</label>
-					<input type="password" name="telNumber" id="telNumber" tabindex="2" class="form-control"
-						minlength=4 maxlength=4 placeholder="เบอร์โทร 4 หลักสุดท้าย (หากไม่เคยกรอกไว้ตอนลงทะเบียวิ่งให้เว้นว่างไว้)"
+					<input type="password" name="phoneNumber" id="phoneNumber" tabindex="2" class="form-control"
+						minlength=4 maxlength=4 placeholder="เบอร์โทร 4 หลักสุดท้าย (หากไม่เคยกรอกไว้ตอนลงทะเบียนวิ่งให้เว้นว่างไว้)"
 						required>
 				</div>
-				<div class="form-group">
-					<button type="button" id="submitButton" class="btn btn-primary">
-						ส่ง
-					</button>
-				</div>
+				<button type="submit" id="submitButton" class="btn btn-primary">
+					ส่ง
+				</button>
 			</form>
 		</form>
 	<% } %>
