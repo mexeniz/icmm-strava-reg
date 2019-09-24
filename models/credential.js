@@ -4,7 +4,7 @@ module.exports = (sequelize, DataTypes) => {
         created_at: DataTypes.DATE,
         updated_at: DataTypes.DATE,
         deleted_at: DataTypes.DATE,
-        strava_client: { type: DataTypes.BIGINT, primaryKey: true },
+        strava_client: { type: DataTypes.STRING, primaryKey: true },
         strava_token: { type: DataTypes.STRING, primaryKey: true },
         strava_code: DataTypes.STRING
     });

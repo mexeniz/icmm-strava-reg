@@ -7,6 +7,6 @@ module.exports = (sequelize, DataTypes) => {
         first_name: DataTypes.STRING,
         last_name: DataTypes.STRING,
         registration_id: DataTypes.BIGINT,
-        strava_id: DataTypes.BIGINT,
+        strava_id: DataTypes.STRING,
     });
 };
