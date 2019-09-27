@@ -18,10 +18,6 @@ const CALL_BACK_URL = process.env.CALL_BACK_URL || `http://${BIND_ADDRESS}:${POR
 const SERVICE_TYPE = process.env.SERVICE_TYPE || "intania";
 const BASE_HREF = process.env.BASE_HREF;
 
-if (BASE_HREF){
-  app.locals.baseURL = BASE_HREF;
-}
-
 // Passport session setup.
 //   To support persistent login sessions, Passport needs to be able to
 //   serialize users into and deserialize users out of the session.  Typically,
@@ -61,6 +57,10 @@ passport.use(new StravaStrategy({
 ));
 
 var app = express.createServer();
+
+// if (BASE_HREF){
+//   app.locals.baseURL = BASE_HREF;
+// }
 
 // configure Express
 app.configure(function () {
