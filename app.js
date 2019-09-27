@@ -85,7 +85,7 @@ app.get('/', function (req, res) {
   if (req.user) {
     // User is authenticated
     queryHelper.getOneUserByStravaId(req.user.id).then(entries => {
-      if (entries.length == 0) {
+      if (entries == null || entries.length == 0) {
         // Failed to find user information
         res.render('index', { user: null });
       } else {
@@ -101,7 +101,7 @@ app.get('/', function (req, res) {
 
 app.get('/profile', ensureAuthenticated, function (req, res) {
   queryHelper.getOneUserByStravaId(req.user.id).then(entries => {
-    if (entries.length == 0) {
+    if (entries == null || entries.length == 0) {
       return res.status(404).send({
         message: 'No matching strava account information'
       });

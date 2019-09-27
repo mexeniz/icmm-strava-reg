@@ -8,7 +8,7 @@ module.exports.makeUserData = function (user, stravaProfile) {
         user: {}
     };
     // Check if user joined intania clubs
-    if (user.intania_clubs && user.intania_clubs[0].length != 0){
+    if (user.intania_clubs && user.intania_clubs.length != 0){
         userData.user['intania'] = user.intania_clubs[0].intania;
     } else {
         userData.user['intania'] = null;
