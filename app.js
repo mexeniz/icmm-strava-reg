@@ -16,6 +16,11 @@ const BIND_ADDRESS = process.env.BIND_ADDRESS || "0.0.0.0";
 const PORT = process.env.PORT || 3000;
 const CALL_BACK_URL = process.env.CALL_BACK_URL || `http://${BIND_ADDRESS}:${PORT}`;
 const SERVICE_TYPE = process.env.SERVICE_TYPE || "intania";
+const BASE_HREF = process.env.BASE_HREF;
+
+if (BASE_HREF){
+  app.locals.baseURL = BASE_HREF;
+}
 
 // Passport session setup.
 //   To support persistent login sessions, Passport needs to be able to
