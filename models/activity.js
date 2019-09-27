@@ -1,7 +1,7 @@
 module.exports = (sequelize, DataTypes) => {
     return sequelize.define('activities', {
         id: { type: DataTypes.BIGINT, primaryKey: true },
-        strava_id: DataTypes.BIGINT,
+        strava_id: DataTypes.STRING,
         user_id: DataTypes.BIGINT,
         created_at: DataTypes.DATE,
         updated_at: DataTypes.DATE,
