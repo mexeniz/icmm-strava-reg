@@ -8,6 +8,7 @@ var urlencode = require('urlencode');
 const models = require('./models')
 const resHelper = require('./resHelper')
 const queryHelper = require('./queryHelper')
+const path = require('path')
 
 const STRAVA_CLIENT_ID = process.env.STRAVA_CLIENT_ID;
 const STRAVA_CLIENT_SECRET = process.env.STRAVA_CLIENT_SECRET;
@@ -273,6 +274,12 @@ if (SERVICE_TYPE == "foundation") {
       })
     });
 }
+
+
+app.get('/vis', function (req, res) {
+  //app.set('views', __dirname+'/views/vis');
+  res.render('../vis/index', { layout: 'blank.ejs', user: null });
+});
 
 app.listen(PORT, BIND_ADDRESS);
 console.log(`App listen ${BIND_ADDRESS}:${PORT}`);
