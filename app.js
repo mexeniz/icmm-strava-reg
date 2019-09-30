@@ -281,7 +281,14 @@ app.get('/generate-foundation-json', function(req, res) {
   
   visPack.generateFoundationJSON()
   .then(function(response) {
-      res.send(response);  
+      // res.send(response);  
+    fs.writeFile("public/data/output-foundation.json", JSON.stringify(response), 'utf8', function (err) {
+      if (err) {
+        console.log("An error occured while writing JSON Object to File.");
+        return console.log(err);
+      }
+    });
+
   });
   
 });
@@ -290,7 +297,13 @@ app.get('/generate-intania-json', function(req, res) {
   
   visPack.generateIntaniaJSON()
   .then(function(response) {
-      res.send(response);  
+      // res.send(response);  
+      fs.writeFile("public/data/output-intania.json", JSON.stringify(response), 'utf8', function (err) {
+      if (err) {
+        console.log("An error occured while writing JSON Object to File.");
+        return console.log(err);
+      }
+    });
   });
   
 });
