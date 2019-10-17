@@ -124,7 +124,7 @@ app.get('/profile', ensureAuthenticated, function (req, res) {
 //   redirecting the user to strava.com.  After authorization, Strava
 //   will redirect the user back to this application at /login/callback
 app.get('/login',
-  passport.authenticate('strava', { scope: ['public'] }),
+  passport.authenticate('strava', { scope: ['activity:read'] }),
   function (req, res) {
     // The request will be redirected to Strava for authentication, so this
     // function will not be called.
@@ -178,7 +178,7 @@ app.get('/auth/strava/callback',
       if (entries.length == 0) {
         console.log(`Creating new credential: id=${userId} strava_client=${STRAVA_CLIENT_ID}`);
         return models.credentials.create({
-          id: userId,
+          user_id: userId,
           strava_client: STRAVA_CLIENT_ID,
           strava_token: user.token,
           strava_code: code,
