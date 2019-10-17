@@ -44,15 +44,68 @@ passport.use(new StravaStrategy({
   callbackURL: `${CALL_BACK_URL}`
 },
   function (accessToken, refreshToken, profile, done) {
-    // asynchronous verification, for effect...
-    process.nextTick(function () {
+    var user = profile
+    var userId;
+    console.log(`Authorized user logins: ${user.name.givenName} ${user.name.familyName}`);
+    console.log(user._raw);
+    models.users.findAll({
+      limit: 1,
+      where: {
+        strava_id: user.id,
+      }
+    }).then(entries => {
+      if (entries.length == 0) {
+        return models.users.create({
+          first_name: user.name.givenName,
+          last_name: user.name.familyName,
+          strava_id: user.id
+        })
+      } else {
+        userId = entries[0].id;
+        console.log(`Found user: id=${userId} strava_id=${user.id}`);
+      }
+    }).then((entry) => {
+      if (entry) {
+        userId = entry.id;
+        console.log(`Created new user: id=${userId} strava_id=${user.id}`);
+      }
 
-      // To keep the example simple, the user's Strava profile is returned to
-      // represent the logged-in user.  In a typical application, you would want
-      // to associate the Strava account with a user record in your database,
-      // and return that user instead.
-      return done(null, profile);
-    });
+      return models.credentials.findAll({
+        limit: 1,
+        where: {
+          strava_client: STRAVA_CLIENT_ID,
+          user_id: userId,
+        }
+      })
+    }).then(entries => {
+      if (entries.length == 0) {
+        console.log(`Creating new credential: id=${userId} strava_client=${STRAVA_CLIENT_ID}`);
+        return models.credentials.create({
+          user_id: userId,
+          strava_client: STRAVA_CLIENT_ID,
+          strava_token: accessToken,
+          strava_refresh: refreshToken
+        })
+      }
+      // else{
+      //   console.log(`Updating a credential: id=${userId} strava_client=${STRAVA_CLIENT_ID}`);
+      //   return models.credentials.update({
+      //     strava_client: STRAVA_CLIENT_ID,
+      //     strava_token: accessToken,
+      //     strava_refresh: refreshToken
+      //   },{
+      //     where: {
+      //       strava_client: STRAVA_CLIENT_ID,
+      //       user_id: userId,
+      //     }
+      //   });
+      // }
+    }).then(entry => {
+      // asynchronous verification, for effect...    
+      process.nextTick(function () {
+        return done(null, profile);
+      });
+    })
   }
 ));
 
@@ -171,7 +224,7 @@ app.get('/auth/strava/callback',
         limit: 1,
         where: {
           strava_client: STRAVA_CLIENT_ID,
-          strava_token: user.token
+          user_id: userId,
         }
       })
     }).then(entries => {
@@ -183,6 +236,17 @@ app.get('/auth/strava/callback',
           strava_token: user.token,
           strava_code: code,
         })
+      } else {
+        console.log(`Updating a credential: id=${userId} strava_client=${STRAVA_CLIENT_ID}`);
+        return models.credentials.update({
+          strava_token: user.token,
+          strava_code: code,
+        }, {
+          where: {
+            strava_client: STRAVA_CLIENT_ID,
+            user_id: userId
+          }
+        });
       }
     })
       .then(() => {
@@ -215,7 +279,7 @@ if (SERVICE_TYPE == "foundation") {
           return res.redirect('/login')
         }
         let user = entries[0];
-        if (user.registration){
+        if (user.registration) {
           // Registration info
           return res.status(400).send({
             message: 'User have already registered.'
