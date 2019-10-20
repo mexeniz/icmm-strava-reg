@@ -12,6 +12,7 @@ const path = require('path')
 
 const STRAVA_CLIENT_ID = process.env.STRAVA_CLIENT_ID;
 const STRAVA_CLIENT_SECRET = process.env.STRAVA_CLIENT_SECRET;
+const STRAVA_SCOPE = process.env.STRAVA_SCOPE || "activity:read,profile:read_all";
 const BIND_ADDRESS = process.env.BIND_ADDRESS || "0.0.0.0";
 const PORT = process.env.PORT || 3000;
 const CALL_BACK_URL = process.env.CALL_BACK_URL || `http://${BIND_ADDRESS}:${PORT}`;
@@ -177,7 +178,7 @@ app.get('/profile', ensureAuthenticated, function (req, res) {
 //   redirecting the user to strava.com.  After authorization, Strava
 //   will redirect the user back to this application at /login/callback
 app.get('/login',
-  passport.authenticate('strava', { scope: ['activity:read'] }),
+  passport.authenticate('strava', { scope: [STRAVA_SCOPE] }),
   function (req, res) {
     // The request will be redirected to Strava for authentication, so this
     // function will not be called.
