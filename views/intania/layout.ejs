@@ -7,12 +7,15 @@
   <meta name="author" content="Intania Runner">
 
   <title>Run Together Challenge by ICMM</title>
+  <!-- <base href = "https://icmm.run/challenge/" /> -->
 
   <!-- Bootstrap core CSS -->
   <link href="bootstrap.min.css" rel="stylesheet">
 
   <!-- Custom styles for this template -->
   <link href="cover.css" rel="stylesheet">
+  
+  <link href="favicon.png" rel="icon" >
 </head>
 
 <body class="text-center">
@@ -23,12 +26,12 @@
         <h3 class="masthead-brand">ICMM 2020 #RunTogetherChallenge</h3>
         <nav class="nav nav-masthead justify-content-center">
           <% if (!user) { %>
-          <a class="nav-link" href="/">Home</a>
-          <a class="nav-link" href="/login">Login</a>
+          <a class="nav-link" href="">Home</a>
+          <a class="nav-link" href="login">Login</a>
           <% } else { %>
-          <a class="nav-link" href="/">Home</a>
-          <a class="nav-link" href="/profile">Profile</a>
-          <a class="nav-link" href="/logout">Logout</a>
+          <a class="nav-link" href="">Home</a>
+          <a class="nav-link" href="profile">Profile</a>
+          <a class="nav-link" href="logout">Logout</a>
           <% } %>
         </nav>
       </div>

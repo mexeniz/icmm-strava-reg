@@ -8,13 +8,16 @@ var urlencode = require('urlencode');
 const models = require('./models')
 const resHelper = require('./resHelper')
 const queryHelper = require('./queryHelper')
+const path = require('path')
 
 const STRAVA_CLIENT_ID = process.env.STRAVA_CLIENT_ID;
 const STRAVA_CLIENT_SECRET = process.env.STRAVA_CLIENT_SECRET;
+const STRAVA_SCOPE = process.env.STRAVA_SCOPE || "activity:read,profile:read_all";
 const BIND_ADDRESS = process.env.BIND_ADDRESS || "0.0.0.0";
 const PORT = process.env.PORT || 3000;
 const CALL_BACK_URL = process.env.CALL_BACK_URL || `http://${BIND_ADDRESS}:${PORT}`;
 const SERVICE_TYPE = process.env.SERVICE_TYPE || "intania";
+const BASE_HREF = process.env.BASE_HREF;
 
 // Passport session setup.
 //   To support persistent login sessions, Passport needs to be able to
@@ -42,19 +45,76 @@ passport.use(new StravaStrategy({
   callbackURL: `${CALL_BACK_URL}`
 },
   function (accessToken, refreshToken, profile, done) {
-    // asynchronous verification, for effect...
-    process.nextTick(function () {
+    var user = profile
+    var userId;
+    console.log(`Authorized user logins: ${user.name.givenName} ${user.name.familyName}`);
+    console.log(user._raw);
+    models.users.findAll({
+      limit: 1,
+      where: {
+        strava_id: user.id,
+      }
+    }).then(entries => {
+      if (entries.length == 0) {
+        return models.users.create({
+          first_name: user.name.givenName,
+          last_name: user.name.familyName,
+          strava_id: user.id
+        })
+      } else {
+        userId = entries[0].id;
+        console.log(`Found user: id=${userId} strava_id=${user.id}`);
+      }
+    }).then((entry) => {
+      if (entry) {
+        userId = entry.id;
+        console.log(`Created new user: id=${userId} strava_id=${user.id}`);
+      }
 
-      // To keep the example simple, the user's Strava profile is returned to
-      // represent the logged-in user.  In a typical application, you would want
-      // to associate the Strava account with a user record in your database,
-      // and return that user instead.
-      return done(null, profile);
-    });
+      return models.credentials.findAll({
+        limit: 1,
+        where: {
+          strava_client: STRAVA_CLIENT_ID,
+          user_id: userId,
+        }
+      })
+    }).then(entries => {
+      if (entries.length == 0) {
+        console.log(`Creating new credential: id=${userId} strava_client=${STRAVA_CLIENT_ID}`);
+        return models.credentials.create({
+          user_id: userId,
+          strava_client: STRAVA_CLIENT_ID,
+          strava_token: accessToken,
+          strava_refresh: refreshToken
+        })
+      }
+      // else{
+      //   console.log(`Updating a credential: id=${userId} strava_client=${STRAVA_CLIENT_ID}`);
+      //   return models.credentials.update({
+      //     strava_client: STRAVA_CLIENT_ID,
+      //     strava_token: accessToken,
+      //     strava_refresh: refreshToken
+      //   },{
+      //     where: {
+      //       strava_client: STRAVA_CLIENT_ID,
+      //       user_id: userId,
+      //     }
+      //   });
+      // }
+    }).then(entry => {
+      // asynchronous verification, for effect...    
+      process.nextTick(function () {
+        return done(null, profile);
+      });
+    })
   }
 ));
 
 var app = express.createServer();
+
+// if (BASE_HREF){
+//   app.locals.baseURL = BASE_HREF;
+// }
 
 // configure Express
 app.configure(function () {
@@ -84,7 +144,7 @@ app.get('/', function (req, res) {
   if (req.user) {
     // User is authenticated
     queryHelper.getOneUserByStravaId(req.user.id).then(entries => {
-      if (entries.length == 0) {
+      if (entries == null || entries.length == 0) {
         // Failed to find user information
         res.render('index', { user: null });
       } else {
@@ -100,7 +160,7 @@ app.get('/', function (req, res) {
 
 app.get('/profile', ensureAuthenticated, function (req, res) {
   queryHelper.getOneUserByStravaId(req.user.id).then(entries => {
-    if (entries.length == 0) {
+    if (entries == null || entries.length == 0) {
       return res.status(404).send({
         message: 'No matching strava account information'
       });
@@ -118,7 +178,7 @@ app.get('/profile', ensureAuthenticated, function (req, res) {
 //   redirecting the user to strava.com.  After authorization, Strava
 //   will redirect the user back to this application at /login/callback
 app.get('/login',
-  passport.authenticate('strava', { scope: ['public'] }),
+  passport.authenticate('strava', { scope: [STRAVA_SCOPE] }),
   function (req, res) {
     // The request will be redirected to Strava for authentication, so this
     // function will not be called.
@@ -165,18 +225,29 @@ app.get('/auth/strava/callback',
         limit: 1,
         where: {
           strava_client: STRAVA_CLIENT_ID,
-          strava_token: user.token
+          user_id: userId,
         }
       })
     }).then(entries => {
       if (entries.length == 0) {
         console.log(`Creating new credential: id=${userId} strava_client=${STRAVA_CLIENT_ID}`);
         return models.credentials.create({
-          id: userId,
+          user_id: userId,
           strava_client: STRAVA_CLIENT_ID,
           strava_token: user.token,
           strava_code: code,
         })
+      } else {
+        console.log(`Updating a credential: id=${userId} strava_client=${STRAVA_CLIENT_ID}`);
+        return models.credentials.update({
+          strava_token: user.token,
+          strava_code: code,
+        }, {
+          where: {
+            strava_client: STRAVA_CLIENT_ID,
+            user_id: userId
+          }
+        });
       }
     })
       .then(() => {
@@ -209,7 +280,7 @@ if (SERVICE_TYPE == "foundation") {
           return res.redirect('/login')
         }
         let user = entries[0];
-        if (user.registration){
+        if (user.registration) {
           // Registration info
           return res.status(400).send({
             message: 'User have already registered.'
@@ -273,6 +344,12 @@ if (SERVICE_TYPE == "foundation") {
       })
     });
 }
+
+
+app.get('/vis', function (req, res) {
+  //app.set('views', __dirname+'/views/vis');
+  res.render('../vis/index', { layout: 'blank.ejs', user: null });
+});
 
 app.listen(PORT, BIND_ADDRESS);
 console.log(`App listen ${BIND_ADDRESS}:${PORT}`);
