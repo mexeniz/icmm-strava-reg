@@ -17,7 +17,7 @@ const BIND_ADDRESS = process.env.BIND_ADDRESS || "0.0.0.0";
 const PORT = process.env.PORT || 3000;
 const CALL_BACK_URL = process.env.CALL_BACK_URL || `http://${BIND_ADDRESS}:${PORT}`;
 const SERVICE_TYPE = process.env.SERVICE_TYPE || "intania";
-const BASE_HREF = process.env.BASE_HREF;
+const BASE_HREF = process.env.BASE_HREF || null;
 
 // Passport session setup.
 //   To support persistent login sessions, Passport needs to be able to
@@ -125,18 +125,24 @@ app.configure(function () {
     console.log("Run as intania challenge service");
     app.set('views', __dirname + '/views/intania');
   }
+  app.set('trust proxy', 1);
   app.set('view engine', 'ejs');
   app.use(express.logger());
-  app.use(express.cookieParser());
-  app.use(express.bodyParser());
   app.use(express.methodOverride());
-  app.use(express.session({ secret: 'intania icmm' }));
+  app.use(express.cookieParser());
+  app.use(express.session({
+	  secret: 'intania icmm' , 
+	  proxy: true,
+    key: 'connection.sid',
+  }));
   // Initialize Passport!  Also use passport.session() middleware, to support
   // persistent login sessions (recommended).
   app.use(passport.initialize());
   app.use(passport.session());
+  app.use(express.bodyParser());
   app.use(app.router);
   app.use(express.static(__dirname + '/public'));
+
 });
 
 
@@ -251,23 +257,23 @@ app.get('/auth/strava/callback',
       }
     })
       .then(() => {
-        return res.redirect('/');
+        return resHelper.redirect(res, BASE_HREF, '/');
       }).catch(err => {
         console.error(err);
-        return res.redirect('/login')
+        return resHelper.redirect(res, BASE_HREF, '/login');
       })
   });
 
 app.get('/logout', function (req, res) {
   req.logout();
-  res.redirect('/');
+  resHelper.redirect(res, BASE_HREF, '/');
 });
 
 if (SERVICE_TYPE == "foundation") {
   app.post('/me',
     (req, res) => {
       if (!req.isAuthenticated()) {
-        return res.redirect('/login')
+        return resHelper.redirect(res, BASE_HREF, '/login');
       }
 
       const user = req.user;
@@ -277,7 +283,7 @@ if (SERVICE_TYPE == "foundation") {
 
       return queryHelper.getOneUserByStravaId(req.user.id).then(entries => {
         if (entries.length == 0) {
-          return res.redirect('/login')
+          return resHelper.redirect(res, BASE_HREF, '/login');
         }
         let user = entries[0];
         if (user.registration) {
@@ -333,7 +339,7 @@ if (SERVICE_TYPE == "foundation") {
           });
         }
       }).then(() => {
-        return res.redirect('/profile');
+        return resHelper.redirect(res, BASE_HREF, '/profile');
       }).catch(err => {
         console.error(err);
         return res.render('error', {
@@ -363,5 +369,5 @@ console.log(`App Strava Client ${STRAVA_CLIENT_ID}`);
 //   login page.
 function ensureAuthenticated(req, res, next) {
   if (req.isAuthenticated()) { return next(); }
-  res.redirect('/login')
+  return resHelper.redirect(res, BASE_HREF, '/login');
 }
