@@ -304,7 +304,7 @@ if (SERVICE_TYPE == "foundation") {
             if (entries.length == 0) {
               var data = resHelper.makeUserData(user, req.user);
               data['error'] = {
-                message: "ข้อมูลรหัสลงทะเบียนไม่ถูกต้อง"
+                message: "ข้อมูล Ranger Number ไม่ถูกต้อง"
               }
               return res.render('error', data);
             }
