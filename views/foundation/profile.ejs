@@ -20,17 +20,33 @@
 		<br>
 		<h4>ลงทะเบียนด้วย Ranger Number</h4>
 		<form action="me" method="post" id="reg-form" role="form" style="display: block;">
+			<div class="row">
+				<div class="col-md-6 mb-3">
+				<label for="firstName">ชื่อ</label>
+				<input type="text" class="form-control" id="firstName" name="firstName" placeholder="รันเนอร์" value="" required="">
+					<div class="invalid-feedback">
+						กรุณากรอกชื่อ
+					</div>
+				</div>
+				<div class="col-md-6 mb-3">
+				<label for="lastName">นามสกุล</label>
+				<input type="text" class="form-control" id="lastName" name="lastName" placeholder="เรนเจอร์" value="" required="">
+					<div class="invalid-feedback">
+						กรุณากรอกนามสกุลนักวิ่ง
+					</div>
+				</div>
+			</div>
 			<div class="form-group">
 				<label>Ranger No. เช่น Ranger-XXXX</label>
 				<input type="text" name="registrationId" id="registrationId" placeholder="Ranger-XXXX" tabindex="1" class="form-control" required>
 			</div>
 			<div class="form-group">
 				<button type="submit" id="submitButton" class="btn btn-primary">
-					ส่ง
+					สมัคร
 				</button>
 			</div>
 		</form>
-		<br>
+		<!-- <br>
 		<br>
 		<h4>หรือ</h4>
 		<h4>ลงทะเบียนด้วย ชื่อ - นามสกุล</h4>
@@ -40,16 +56,16 @@
                     <div class="col-md-6 mb-3">
                     <label for="firstName">ชื่อ</label>
                     <input type="text" class="form-control" id="firstName" name="firstName" placeholder="" value="" required="">
-                    <div class="invalid-feedback">
-                        กรุณากรอกชื่อ
-                    </div>
+						<div class="invalid-feedback">
+							กรุณากรอกชื่อ
+						</div>
                     </div>
                     <div class="col-md-6 mb-3">
                     <label for="lastName">นามสกุล</label>
                     <input type="text" class="form-control" id="lastName" name="lastName" placeholder="" value="" required="">
-                    <div class="invalid-feedback">
-                        กรุณากรอกนามสกุลนักวิ่ง
-                    </div>
+						<div class="invalid-feedback">
+							กรุณากรอกนามสกุลนักวิ่ง
+						</div>
                     </div>
                 </div>
 				<div class="form-group">
@@ -62,7 +78,7 @@
 					ส่ง
 				</button>
 			</form>
-		</form>
+		</form> -->
 	<% } %>
 <% } else { %>
 	<h3 color='red'>ไม่พบข้อมูล กรุณา Login ใหม่</h3>
