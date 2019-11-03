@@ -277,9 +277,8 @@ if (SERVICE_TYPE == "foundation") {
       }
 
       const user = req.user;
-      console.log('req.body');
       console.log(req.body);
-      const { registrationId, phoneNumber, firstName, lastName, raceType } = req.body;
+      const { registrationId, firstName, lastName } = req.body;
 
       return queryHelper.getOneUserByStravaId(req.user.id).then(entries => {
         if (entries.length == 0) {
@@ -293,31 +292,12 @@ if (SERVICE_TYPE == "foundation") {
           });
         }
 
-        if (registrationId) {
-          // Register by registration ID from Thai.run
+        if (registrationId && firstName && lastName) {
+          // Register by registration ID sent to applicants by email
           return models.registrations.findAll({
             limit: 1,
             where: {
               registration_id: registrationId,
-            }
-          }).then(entries => {
-            if (entries.length == 0) {
-              var data = resHelper.makeUserData(user, req.user);
-              data['error'] = {
-                message: "ข้อมูล Ranger Number ไม่ถูกต้อง"
-              }
-              return res.render('error', data);
-            }
-            // Update user.registration_id in database
-            user.registration_id = entries[0].id;
-            return user.save()
-          })
-        } else if (firstName && lastName && phoneNumber) {
-          // Register by general information
-          return models.registrations.findAll({
-            limit: 1,
-            where: {
-              phone_number: phoneNumber,
               first_name: firstName,
               last_name: lastName,
             }
@@ -325,7 +305,7 @@ if (SERVICE_TYPE == "foundation") {
             if (entries.length == 0) {
               var data = resHelper.makeUserData(user, req.user);
               data['error'] = {
-                message: "ข้อมูล ชื่อ นามสกุล หรือ เบอร์โทร ไม่ถูกต้อง"
+                message: "ข้อมูล Ranger Number หรือ ชื่อ-นามสกุล ไม่ถูกต้อง"
               }
               return res.render('error', data);
             }
