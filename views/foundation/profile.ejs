@@ -16,8 +16,7 @@
 		<h4>ระยะทางสะสมให้ทีม: <%= user.totalDistance / 1000.0 %> KM</h4>
 		<br>
 	<% } else { %>
-		<h4>กรุณากรอกข้อมูลที่ได้จาก Email ICMM 2020</h4>
-		<p class="text-danger">ไม่สามารถเปลี่ยนแปลงข้อมูลภายหลังได้ กรุณาตรวจสอบข้อมูลให้ถูกต้องก่อนกดสมัคร</p>
+		<h4>กรุณากรอกข้อมูลที่ได้รับจาก Email ยืนยันการสมัครวิ่ง ICMM 2020</h4>
 		<form action="me" method="post" id="reg-form" role="form" style="display: block;">
 			<div class="row">
 				<div class="col-md-6 mb-3">
@@ -36,10 +35,13 @@
 				</div>
 			</div>
 			<div class="form-group">
-				<label>Ranger No. เช่น Ranger-XXXX</label>
+				<label>Ranger Number</label>
 				<input type="text" name="registrationId" id="registrationId" placeholder="Ranger-XXXX" tabindex="1" class="form-control" required>
 			</div>
 			<div class="form-group">
+				<div class="alert alert-warning" role="alert">
+					ไม่สามารถเปลี่ยนแปลงข้อมูลภายหลังได้<br>กรุณาตรวจสอบข้อมูลให้ถูกต้องก่อนกดสมัคร
+				</div>
 				<button type="submit" id="submitButton" class="btn btn-primary">
 					สมัคร
 				</button>

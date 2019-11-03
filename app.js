@@ -297,9 +297,9 @@ if (SERVICE_TYPE == "foundation") {
           return models.registrations.findAll({
             limit: 1,
             where: {
-              registration_id: registrationId,
-              first_name: firstName,
-              last_name: lastName,
+              registration_id: registrationId.trim(),
+              first_name: firstName.trim(),
+              last_name: lastName.trim(),
             }
           }).then(entries => {
             if (entries.length == 0) {
