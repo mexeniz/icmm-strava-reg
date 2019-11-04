@@ -4,29 +4,33 @@ services:
   strava-intania-reg:
     build: .
     environment:
+      - BASE_HREF=${INT_BASE_HREF}
       - STRAVA_CLIENT_ID=${INT_STRAVA_CLIENT_ID}
       - STRAVA_CLIENT_SECRET=${INT_STRAVA_CLIENT_SECRET}
+      - STRAVA_SCOPE=${INT_STRAVA_SCOPE}
       - CALL_BACK_URL=${INT_CALL_BACK_URL}
+      - PORT=8010
       - DB_HOST=${DB_HOST}
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
       - SERVICE_TYPE=intania
-    volumes:
-      - .:/icmm-strava-reg
     ports:
-      - 8090:3000
+      - 8010:8010
+    # network_mode: 'host'
     
   strava-foundation-reg:
     build: .
     environment:
+      - BASE_HREF=${F5_BASE_HREF}
       - STRAVA_CLIENT_ID=${F5_STRAVA_CLIENT_ID}
       - STRAVA_CLIENT_SECRET=${F5_STRAVA_CLIENT_SECRET}
+      - STRAVA_SCOPE=${F5_STRAVA_SCOPE}
       - CALL_BACK_URL=${F5_CALL_BACK_URL}
+      - PORT=8011
       - DB_HOST=${DB_HOST}
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
       - SERVICE_TYPE=foundation
-    volumes:
-      - .:/icmm-strava-reg
     ports:
-      - 8091:3000
+      - 8011:8011
+    # network_mode: 'host'

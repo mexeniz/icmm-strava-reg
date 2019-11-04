@@ -13,10 +13,12 @@ const visPack = require('./visPack.js')
 
 const STRAVA_CLIENT_ID = process.env.STRAVA_CLIENT_ID;
 const STRAVA_CLIENT_SECRET = process.env.STRAVA_CLIENT_SECRET;
+const STRAVA_SCOPE = process.env.STRAVA_SCOPE || "activity:read,profile:read_all";
 const BIND_ADDRESS = process.env.BIND_ADDRESS || "0.0.0.0";
 const PORT = process.env.PORT || 3000;
 const CALL_BACK_URL = process.env.CALL_BACK_URL || `http://${BIND_ADDRESS}:${PORT}`;
 const SERVICE_TYPE = process.env.SERVICE_TYPE || "intania";
+const BASE_HREF = process.env.BASE_HREF || null;
 
 // Passport session setup.
 //   To support persistent login sessions, Passport needs to be able to
@@ -44,19 +46,76 @@ passport.use(new StravaStrategy({
   callbackURL: `${CALL_BACK_URL}`
 },
   function (accessToken, refreshToken, profile, done) {
-    // asynchronous verification, for effect...
-    process.nextTick(function () {
+    var user = profile
+    var userId;
+    console.log(`Authorized user logins: ${user.name.givenName} ${user.name.familyName}`);
+    console.log(user._raw);
+    models.users.findAll({
+      limit: 1,
+      where: {
+        strava_id: user.id,
+      }
+    }).then(entries => {
+      if (entries.length == 0) {
+        return models.users.create({
+          first_name: user.name.givenName,
+          last_name: user.name.familyName,
+          strava_id: user.id
+        })
+      } else {
+        userId = entries[0].id;
+        console.log(`Found user: id=${userId} strava_id=${user.id}`);
+      }
+    }).then((entry) => {
+      if (entry) {
+        userId = entry.id;
+        console.log(`Created new user: id=${userId} strava_id=${user.id}`);
+      }
 
-      // To keep the example simple, the user's Strava profile is returned to
-      // represent the logged-in user.  In a typical application, you would want
-      // to associate the Strava account with a user record in your database,
-      // and return that user instead.
-      return done(null, profile);
-    });
+      return models.credentials.findAll({
+        limit: 1,
+        where: {
+          strava_client: STRAVA_CLIENT_ID,
+          user_id: userId,
+        }
+      })
+    }).then(entries => {
+      if (entries.length == 0) {
+        console.log(`Creating new credential: id=${userId} strava_client=${STRAVA_CLIENT_ID}`);
+        return models.credentials.create({
+          user_id: userId,
+          strava_client: STRAVA_CLIENT_ID,
+          strava_token: accessToken,
+          strava_refresh: refreshToken
+        })
+      }
+      // else{
+      //   console.log(`Updating a credential: id=${userId} strava_client=${STRAVA_CLIENT_ID}`);
+      //   return models.credentials.update({
+      //     strava_client: STRAVA_CLIENT_ID,
+      //     strava_token: accessToken,
+      //     strava_refresh: refreshToken
+      //   },{
+      //     where: {
+      //       strava_client: STRAVA_CLIENT_ID,
+      //       user_id: userId,
+      //     }
+      //   });
+      // }
+    }).then(entry => {
+      // asynchronous verification, for effect...    
+      process.nextTick(function () {
+        return done(null, profile);
+      });
+    })
   }
 ));
 
 var app = express.createServer();
+
+// if (BASE_HREF){
+//   app.locals.baseURL = BASE_HREF;
+// }
 
 // configure Express
 app.configure(function () {
@@ -67,18 +126,24 @@ app.configure(function () {
     console.log("Run as intania challenge service");
     app.set('views', __dirname + '/views/intania');
   }
+  app.set('trust proxy', 1);
   app.set('view engine', 'ejs');
   app.use(express.logger());
-  app.use(express.cookieParser());
-  app.use(express.bodyParser());
   app.use(express.methodOverride());
-  app.use(express.session({ secret: 'intania icmm' }));
+  app.use(express.cookieParser());
+  app.use(express.session({
+	  secret: 'intania icmm' , 
+	  proxy: true,
+    key: 'connection.sid',
+  }));
   // Initialize Passport!  Also use passport.session() middleware, to support
   // persistent login sessions (recommended).
   app.use(passport.initialize());
   app.use(passport.session());
+  app.use(express.bodyParser());
   app.use(app.router);
   app.use(express.static(__dirname + '/public'));
+
 });
 
 
@@ -86,7 +151,7 @@ app.get('/', function (req, res) {
   if (req.user) {
     // User is authenticated
     queryHelper.getOneUserByStravaId(req.user.id).then(entries => {
-      if (entries.length == 0) {
+      if (entries == null || entries.length == 0) {
         // Failed to find user information
         res.render('index', { user: null });
       } else {
@@ -102,7 +167,7 @@ app.get('/', function (req, res) {
 
 app.get('/profile', ensureAuthenticated, function (req, res) {
   queryHelper.getOneUserByStravaId(req.user.id).then(entries => {
-    if (entries.length == 0) {
+    if (entries == null || entries.length == 0) {
       return res.status(404).send({
         message: 'No matching strava account information'
       });
@@ -120,7 +185,7 @@ app.get('/profile', ensureAuthenticated, function (req, res) {
 //   redirecting the user to strava.com.  After authorization, Strava
 //   will redirect the user back to this application at /login/callback
 app.get('/login',
-  passport.authenticate('strava', { scope: ['public'] }),
+  passport.authenticate('strava', { scope: [STRAVA_SCOPE] }),
   function (req, res) {
     // The request will be redirected to Strava for authentication, so this
     // function will not be called.
@@ -167,90 +232,81 @@ app.get('/auth/strava/callback',
         limit: 1,
         where: {
           strava_client: STRAVA_CLIENT_ID,
-          strava_token: user.token
+          user_id: userId,
         }
       })
     }).then(entries => {
       if (entries.length == 0) {
         console.log(`Creating new credential: id=${userId} strava_client=${STRAVA_CLIENT_ID}`);
         return models.credentials.create({
-          id: userId,
+          user_id: userId,
           strava_client: STRAVA_CLIENT_ID,
           strava_token: user.token,
           strava_code: code,
         })
+      } else {
+        console.log(`Updating a credential: id=${userId} strava_client=${STRAVA_CLIENT_ID}`);
+        return models.credentials.update({
+          strava_token: user.token,
+          strava_code: code,
+        }, {
+          where: {
+            strava_client: STRAVA_CLIENT_ID,
+            user_id: userId
+          }
+        });
       }
     })
       .then(() => {
-        return res.redirect('/');
+        return resHelper.redirect(res, BASE_HREF, '/');
       }).catch(err => {
         console.error(err);
-        return res.redirect('/login')
+        return resHelper.redirect(res, BASE_HREF, '/login');
       })
   });
 
 app.get('/logout', function (req, res) {
   req.logout();
-  res.redirect('/');
+  resHelper.redirect(res, BASE_HREF, '/');
 });
 
 if (SERVICE_TYPE == "foundation") {
   app.post('/me',
     (req, res) => {
       if (!req.isAuthenticated()) {
-        return res.redirect('/login')
+        return resHelper.redirect(res, BASE_HREF, '/login');
       }
 
       const user = req.user;
-      console.log('req.body');
       console.log(req.body);
-      const { registrationId, phoneNumber, firstName, lastName, raceType } = req.body;
+      const { registrationId, firstName, lastName } = req.body;
 
       return queryHelper.getOneUserByStravaId(req.user.id).then(entries => {
         if (entries.length == 0) {
-          return res.redirect('/login')
+          return resHelper.redirect(res, BASE_HREF, '/login');
         }
         let user = entries[0];
-        if (user.registration){
+        if (user.registration) {
           // Registration info
           return res.status(400).send({
             message: 'User have already registered.'
           });
         }
 
-        if (registrationId) {
-          // Register by registration ID from Thai.run
+        if (registrationId && firstName && lastName) {
+          // Register by registration ID sent to applicants by email
           return models.registrations.findAll({
             limit: 1,
             where: {
-              registration_id: registrationId,
+              registration_id: registrationId.trim(),
+              first_name: firstName.trim(),
+              last_name: lastName.trim(),
             }
           }).then(entries => {
             if (entries.length == 0) {
               var data = resHelper.makeUserData(user, req.user);
               data['error'] = {
-                message: "ข้อมูลรหัสลงทะเบียนไม่ถูกต้อง"
-              }
-              return res.render('error', data);
-            }
-            // Update user.registration_id in database
-            user.registration_id = entries[0].id;
-            return user.save()
-          })
-        } else if (firstName && lastName && phoneNumber) {
-          // Register by general information
-          return models.registrations.findAll({
-            limit: 1,
-            where: {
-              phone_number: phoneNumber,
-              first_name: firstName,
-              last_name: lastName,
-            }
-          }).then(entries => {
-            if (entries.length == 0) {
-              var data = resHelper.makeUserData(user, req.user);
-              data['error'] = {
-                message: "ข้อมูล ชื่อ นามสกุล หรือ เบอร์โทร ไม่ถูกต้อง"
+                message: "ข้อมูล Ranger Number หรือ ชื่อ-นามสกุล ไม่ถูกต้อง"
               }
               return res.render('error', data);
             }
@@ -264,7 +320,7 @@ if (SERVICE_TYPE == "foundation") {
           });
         }
       }).then(() => {
-        return res.redirect('/profile');
+        return resHelper.redirect(res, BASE_HREF, '/profile');
       }).catch(err => {
         console.error(err);
         return res.render('error', {
@@ -328,5 +384,5 @@ console.log(`App Strava Client ${STRAVA_CLIENT_ID}`);
 //   login page.
 function ensureAuthenticated(req, res, next) {
   if (req.isAuthenticated()) { return next(); }
-  res.redirect('/login')
+  return resHelper.redirect(res, BASE_HREF, '/login');
 }
