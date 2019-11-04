@@ -9,6 +9,7 @@ const models = require('./models')
 const resHelper = require('./resHelper')
 const queryHelper = require('./queryHelper')
 const path = require('path')
+const visPack = require('./visPack.js')
 
 const STRAVA_CLIENT_ID = process.env.STRAVA_CLIENT_ID;
 const STRAVA_CLIENT_SECRET = process.env.STRAVA_CLIENT_SECRET;
@@ -331,10 +332,44 @@ if (SERVICE_TYPE == "foundation") {
     });
 }
 
+// pull data and generate public/data/output.json
+app.get('/generate-foundation-json', function(req, res) {
+  
+  visPack.generateFoundationJSON()
+  .then(function(response) {
+      // res.send(response);  
+    fs.writeFile("public/data/output-foundation.json", JSON.stringify(response), 'utf8', function (err) {
+      if (err) {
+        console.log("An error occured while writing JSON Object to File.");
+        return console.log(err);
+      }
+    });
 
-app.get('/vis', function (req, res) {
-  //app.set('views', __dirname+'/views/vis');
-  res.render('../vis/index', { layout: 'blank.ejs', user: null });
+  });
+  
+});
+
+app.get('/generate-intania-json', function(req, res) {
+  
+  visPack.generateIntaniaJSON()
+  .then(function(response) {
+      // res.send(response);  
+      fs.writeFile("public/data/output-intania.json", JSON.stringify(response), 'utf8', function (err) {
+      if (err) {
+        console.log("An error occured while writing JSON Object to File.");
+        return console.log(err);
+      }
+    });
+  });
+  
+});
+
+app.get('/display-foundation-graph', function (req, res) {
+  res.render('../graph/foundation', { layout: 'blank.ejs'});
+});
+
+app.get('/display-intania-graph', function (req, res) {
+  res.render('../graph/intania', { layout: 'blank.ejs' });
 });
 
 app.listen(PORT, BIND_ADDRESS);

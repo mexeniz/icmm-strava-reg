@@ -87,7 +87,8 @@
             .attr('viewBox', `${-width / 2} ${-height / 2} ${width} ${height}`)
             .on('click', () => focusOn()); // Reset zoom on canvas click
 
-        d3.json('data/outputstat.json', (error, root) => {
+        d3.json('data/output-intania.json', (error, root) => {
+        // d3.json('generate-intania-json', (error, root) => {
             if (error) throw error;
 
             root = d3.hierarchy(root);
