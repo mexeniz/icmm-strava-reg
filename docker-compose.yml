@@ -14,6 +14,8 @@ services:
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
       - SERVICE_TYPE=intania
+    #volumes:
+    #  - ./:/icmm-strava-reg
     ports:
       - 8010:8010
     # network_mode: 'host'
@@ -31,6 +33,8 @@ services:
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
       - SERVICE_TYPE=foundation
+    #volumes:
+    #  - ./:/icmm-strava-reg
     ports:
       - 8011:8011
     # network_mode: 'host'

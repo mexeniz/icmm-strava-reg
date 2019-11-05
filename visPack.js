@@ -25,16 +25,18 @@ module.exports = {
 
 	  							userActivity = eachUserSumActivities.find(function(sumAct) {
 	  								return sumAct.user_id == user.id;
-		  						})
- 
+		  						});
 
-		  						newEntry = {
-			  						 		name: user.first_name+' '+user.last_name, 
-			  								size: userActivity.total_distance,
+                  if(userActivity !== undefined) {
+  		  						newEntry = {
+  			  						 		name: user.first_name+' '+user.last_name, 
+  			  								size: userActivity.total_distance,
 
-			  							};
+  			  							};
 
-		  						newFoundation.children.push(newEntry);
+  		  						newFoundation.children.push(newEntry);
+                  }
+                  
 	  						}
 
 	  					});
@@ -75,14 +77,17 @@ module.exports = {
 	  								return sumAct.user_id == user.id;
 		  						})
  
+                  if(userActivity !== undefined) {
 
-		  						newEntry = {
-			  						 		name: user.first_name+' '+user.last_name, 
-			  								size: userActivity.total_distance,
+  		  						newEntry = {
+  			  						 		name: user.first_name+' '+user.last_name, 
+  			  								size: userActivity.total_distance,
 
-			  							};
+  			  							};
 
-		  						newIntania.children.push(newEntry);
+  		  						newIntania.children.push(newEntry);
+                  }
+
 	  						}
 
 	  					});
