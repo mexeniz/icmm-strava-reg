@@ -19,6 +19,7 @@ const PORT = process.env.PORT || 3000;
 const CALL_BACK_URL = process.env.CALL_BACK_URL || `http://${BIND_ADDRESS}:${PORT}`;
 const SERVICE_TYPE = process.env.SERVICE_TYPE || "intania";
 const BASE_HREF = process.env.BASE_HREF || null;
+const CHALLENGE_RESULT_URL = process.env.CHALLENGE_RESULT_URL || null; 
 
 // Passport session setup.
 //   To support persistent login sessions, Passport needs to be able to
@@ -371,6 +372,13 @@ app.get('/display-foundation-graph', function (req, res) {
 app.get('/display-intania-graph', function (req, res) {
   res.render('../graph/intania', { layout: 'blank.ejs' });
 });
+
+if (CHALLENGE_RESULT_URL){
+  app.get('/result', function(req, res){
+    res.redirect(CHALLENGE_RESULT_URL);
+  });
+}
+
 
 app.listen(PORT, BIND_ADDRESS);
 console.log(`App listen ${BIND_ADDRESS}:${PORT}`);
