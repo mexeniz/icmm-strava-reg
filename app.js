@@ -380,8 +380,12 @@ if (CHALLENGE_RESULT_URL){
   });
 }
 
-app.options("/mod_promo_multiplier", cors());
-app.post("/mod_promo_multiplier", cors(), function(req, res) {
+app.options("/ping", cors());
+app.ping("/ping", cors(), function(req, res) {
+  res.send('pong');
+});
+  app.options("/mod_promo_multiplier", cors());
+  app.post("/mod_promo_multiplier", cors(), function(req, res) {
   if (
     !req.body.newMul ||
     !req.body.ids ||
