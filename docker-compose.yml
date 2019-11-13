@@ -34,6 +34,7 @@ services:
       - DB_HOST=${DB_HOST}
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
+      - MOD_MULTIPLIER_PWD=${MOD_MULTIPLIER_PWD}
       - SERVICE_TYPE=foundation
     #volumes:
     #  - ./:/icmm-strava-reg
