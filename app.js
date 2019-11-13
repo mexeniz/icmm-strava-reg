@@ -1,4 +1,5 @@
 var express = require('express')
+  , cors = require('cors')
   , passport = require('passport')
   , util = require('util')
   , StravaStrategy = require('passport-strava-oauth2').Strategy
@@ -379,6 +380,39 @@ if (CHALLENGE_RESULT_URL){
   });
 }
 
+app.options("/mod_promo_multiplier", cors());
+app.post("/mod_promo_multiplier", cors(), function(req, res) {
+  if (
+    !req.body.newMul ||
+    !req.body.ids ||
+    !req.body.pwd ||
+    req.body.pwd != "ZI^yK+bGdHbE&Upn04X7u!7&PV2X0v+1ID9xV0b?YWz" ||
+    !req.body.ids.length ||
+    isNaN(req.body.newMul)
+  )
+    return res.send("error");
+  var newMul = req.body.newMul;
+  newMul = newMul < 1 ? 1 : newMul;
+  newMul = newMul > 5 ? 5 : newMul;
+  const connection = mysql.createConnection({
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: "strava"
+  });
+  connection.execute(
+    `update activities set promo_multiplier=? where strava_id in(${Array(
+      req.body.ids.length
+    )
+      .fill("?")
+      .join(",")})`,
+    [req.body.newMul, ...req.body.ids],
+    function(err) {
+      if (err) return res.send("error");
+      res.send("ok");
+    }
+  );
+});
 
 app.listen(PORT, BIND_ADDRESS);
 console.log(`App listen ${BIND_ADDRESS}:${PORT}`);
