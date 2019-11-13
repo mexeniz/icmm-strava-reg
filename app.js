@@ -381,7 +381,7 @@ if (CHALLENGE_RESULT_URL){
 }
 
 app.options("/ping", cors());
-app.ping("/ping", cors(), function(req, res) {
+app.get("/ping", cors(), function(req, res) {
   res.send('pong');
 });
   app.options("/mod_promo_multiplier", cors());
