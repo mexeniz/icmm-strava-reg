@@ -17,7 +17,7 @@ module.exports.getOneUserByStravaId = function (strava_id) {
           {
             model: models.activities,
             attributes: [
-            [models.sequelize.fn('sum', models.sequelize.col('activities.distance')), 'total_distance'],
+            [models.sequelize.literal('sum(activities.distance * if(isnull(activities.promo_multiplier),1,activities.promo_multiplier))'), 'total_distance'],
             [models.sequelize.fn('count', models.sequelize.col('activities.strava_id')), 'total_activities']
           ]
           }
@@ -98,7 +98,7 @@ module.exports.getEachUserSumActivities = async function () {
         },
         attributes: [
           'user_id',
-          [models.sequelize.fn('sum', models.sequelize.col('activities.distance')), 'total_distance'],
+          [models.sequelize.literal('sum(activities.distance * if(isnull(activities.promo_multiplier),1,activities.promo_multiplier))'), 'total_distance'],
           [models.sequelize.fn('count', models.sequelize.col('activities.strava_id')), 'total_activities'],
         ],
         group: ['activities.user_id'],
