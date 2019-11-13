@@ -395,7 +395,7 @@ app.get("/ping", cors(), function(req, res) {
     !req.body.newMul ||
     !req.body.ids ||
     !req.body.pwd ||
-    req.body.pwd != "ZI^yK+bGdHbE&Upn04X7u!7&PV2X0v+1ID9xV0b?YWz" ||
+    req.body.pwd != process.env.MOD_MULTIPLIER_PWD ||
     !req.body.ids.length ||
     isNaN(req.body.newMul)
   )
