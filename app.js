@@ -405,6 +405,7 @@ app.get("/ping", cors(), function(req, res) {
     password: process.env.DB_PASSWORD,
     database: "strava"
   });
+  // where strava_id in(?,?,?,?,...) for total of ids.length
   connection.execute(
     `update activities set promo_multiplier=? where strava_id in(${Array(
       req.body.ids.length
