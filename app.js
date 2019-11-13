@@ -1,5 +1,6 @@
 var express = require('express')
   , cors = require('cors')
+  , mysql = require('mysql2')
   , passport = require('passport')
   , util = require('util')
   , StravaStrategy = require('passport-strava-oauth2').Strategy
