@@ -4,7 +4,14 @@ var express = require('express')
   , passport = require('passport')
   , util = require('util')
   , StravaStrategy = require('passport-strava-oauth2').Strategy
-  , fs = require('fs');
+  , fs = require('fs')
+  , logger = require('morgan')
+  , bodyParser = require('body-parser')
+  , session = require('express-session')
+  , cookieParser = require('cookie-parser')
+  , cookieSession = require('cookie-session')
+  , methodOverride = require('method-override')
+  , expressLayouts = require('express-ejs-layouts');;
 var urlencode = require('urlencode');
 
 const models = require('./models')
@@ -114,40 +121,37 @@ passport.use(new StravaStrategy({
   }
 ));
 
-var app = express.createServer();
+var app = express();
 
 // if (BASE_HREF){
 //   app.locals.baseURL = BASE_HREF;
 // }
 
 // configure Express
-app.configure(function () {
-  if (SERVICE_TYPE === "foundation") {
-    console.log("Run as foundation challenge service");
-    app.set('views', __dirname + '/views/foundation');
-  } else {
-    console.log("Run as intania challenge service");
-    app.set('views', __dirname + '/views/intania');
-  }
-  app.set('trust proxy', 1);
-  app.set('view engine', 'ejs');
-  app.use(express.logger());
-  app.use(express.methodOverride());
-  app.use(express.cookieParser());
-  app.use(express.session({
-	  secret: 'intania icmm' , 
-	  proxy: true,
-    key: 'connection.sid',
-  }));
-  // Initialize Passport!  Also use passport.session() middleware, to support
-  // persistent login sessions (recommended).
-  app.use(passport.initialize());
-  app.use(passport.session());
-  app.use(express.bodyParser());
-  app.use(app.router);
-  app.use(express.static(__dirname + '/public'));
-
-});
+if (SERVICE_TYPE === "foundation") {
+  console.log("Run as foundation challenge service");
+  app.set('views', __dirname + '/views/foundation');
+} else {
+  console.log("Run as intania challenge service");
+  app.set('views', __dirname + '/views/intania');
+}
+app.set('trust proxy', 1);
+app.set('view engine', 'ejs');
+app.use(expressLayouts);
+app.use(logger('combined'));
+app.use(methodOverride());
+app.use(cookieParser());
+app.use(session({
+  secret: 'intania icmm' , 
+  proxy: true,
+  key: 'connection.sid',
+}));
+// Initialize Passport!  Also use passport.session() middleware, to support
+// persistent login sessions (recommended).
+app.use(passport.initialize());
+app.use(passport.session());
+app.use(bodyParser());
+app.use(express.static(__dirname + '/public'));
 
 
 app.get('/', function (req, res) {
