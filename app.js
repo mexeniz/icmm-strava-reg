@@ -372,11 +372,11 @@ app.get('/generate-intania-json', function(req, res) {
 });
 
 app.get('/display-foundation-graph', function (req, res) {
-  res.render('../graph/foundation', { layout: 'blank'});
+  res.render('../graph/foundation', { layout: '../graph/blank'});
 });
 
 app.get('/display-intania-graph', function (req, res) {
-  res.render('../graph/intania', { layout: 'blank' });
+  res.render('../graph/intania', { layout: '../graph/blank' });
 });
 
 if (CHALLENGE_RESULT_URL){
