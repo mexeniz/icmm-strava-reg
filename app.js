@@ -372,11 +372,42 @@ app.get('/generate-intania-json', function(req, res) {
 });
 
 app.get('/display-foundation-graph', function (req, res) {
-  res.render('../graph/foundation', { layout: '../graph/blank'});
+
+  if (req.user) {
+    // User is authenticated
+    queryHelper.getOneUserByStravaId(req.user.id).then(entries => {
+      if (entries == null || entries.length == 0) {
+        // Failed to find user information
+        res.render('index', { user: null });
+      } else {
+        var data = resHelper.makeUserData(entries[0], req.user);
+        res.render('../graph/foundation',  data);
+      }
+    })
+  } else {
+    // User is not authenticated
+    res.render('index', { user: null });
+  }
+
 });
 
 app.get('/display-intania-graph', function (req, res) {
-  res.render('../graph/intania', { layout: '../graph/blank' });
+  
+  if (req.user) {
+    // User is authenticated
+    queryHelper.getOneUserByStravaId(req.user.id).then(entries => {
+      if (entries == null || entries.length == 0) {
+        // Failed to find user information
+        res.render('index', { user: null });
+      } else {
+        var data = resHelper.makeUserData(entries[0], req.user);
+        res.render('../graph/intania',  data);
+      }
+    })
+  } else {
+    // User is not authenticated
+    res.render('index', { user: null });
+  }
 });
 
 if (CHALLENGE_RESULT_URL){
