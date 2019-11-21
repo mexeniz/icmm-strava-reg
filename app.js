@@ -319,15 +319,15 @@ if (SERVICE_TYPE == "foundation") {
             }
             // Update user.registration_id in database
             user.registration_id = entries[0].id;
-            return user.save()
+            return user.save().then(() => {
+              return resHelper.redirect(res, BASE_HREF, '/profile');
+            });
           })
         } else {
           return res.status(400).send({
             message: 'Bad request'
           });
         }
-      }).then(() => {
-        return resHelper.redirect(res, BASE_HREF, '/profile');
       }).catch(err => {
         console.error(err);
         return res.render('error', {

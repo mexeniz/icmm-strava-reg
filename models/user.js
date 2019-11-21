@@ -1,6 +1,9 @@
 module.exports = (sequelize, DataTypes) => {
     return sequelize.define('users', {
-        id: { type: DataTypes.BIGINT, primaryKey: true },
+        id: { type: DataTypes.BIGINT,
+            primaryKey: true,
+            autoIncrement: true
+        },    
         created_at: DataTypes.DATE,
         updated_at: DataTypes.DATE,
         deleted_at: DataTypes.DATE,
