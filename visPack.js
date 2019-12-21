@@ -14,7 +14,7 @@ module.exports = {
   					// foundation -> athlete
 
   					// prep foundation list
-  					newData = {name:'ICMM 2020 Foundation', children:[]}
+  					newData = {name:'ICMM 2020 Ranger Challenge', children:[]}
   					for(i in foundations) {
   						newFoundation = {name: foundations[i].name, children: []};
 

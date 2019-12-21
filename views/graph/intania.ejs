@@ -1,9 +1,3 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>ICMM Challenge Vis - Demo</title>
     <style>
         body {
             font-family: Sans-serif;
@@ -31,11 +25,11 @@
     </style>
 
     <script src='https://d3js.org/d3.v4.min.js'></script>
-</head>
-<body>
+    
+    <div id="stage"></div>
     <script>
-        const width = window.innerWidth,
-            height = window.innerHeight,
+        const width = document.getElementsByClassName('cover-container')[0].offsetWidth,
+            height = document.getElementsByClassName('cover-container')[0].offsetHeight,
             maxRadius = (Math.min(width, height) / 2) - 5;
 
         const formatNumber = d3.format(',d');
@@ -82,8 +76,8 @@
         };
 
         const svg = d3.select('body').append('svg')
-            .style('width', '100vw')
-            .style('height', '100vh')
+            // .style('width', '100vw')
+            // .style('height', '100vh')
             .attr('viewBox', `${-width / 2} ${-height / 2} ${width} ${height}`)
             .on('click', () => focusOn()); // Reset zoom on canvas click
 
@@ -171,5 +165,3 @@
             }
         }
     </script>
-</body>
-</html>
