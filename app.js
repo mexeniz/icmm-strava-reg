@@ -433,7 +433,7 @@ app.get("/ping", cors(), function(req, res) {
     return res.send("error");
   var newMul = req.body.newMul;
   newMul = newMul < 1 ? 1 : newMul;
-  newMul = newMul > 5 ? 5 : newMul;
+  newMul = newMul > 20 ? 20 : newMul;
   const connection = mysql.createConnection({
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
