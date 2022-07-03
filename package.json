@@ -5,7 +5,7 @@
   "name": "passport-strava-examples-login",
   "version": "0.0.1",
   "dependencies": {
-    "ejs": "2.6.1",
+    "ejs": "3.1.7",
     "express": "3.11.0",
     "mysql2": "^1.7.0",
     "passport": "0.4.x",
