@@ -10,7 +10,7 @@
     "mysql2": "^1.7.0",
     "passport": "0.4.x",
     "passport-strava-oauth2": "0.1.x",
-    "sequelize": "^5.18.4",
+    "sequelize": "^6.28.2",
     "urlencode": "^1.1.0"
   }
 }
